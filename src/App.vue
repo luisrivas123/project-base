@@ -34,7 +34,7 @@ export default {
 
               return { name, phone: numeroFormateado, email };
             });
-            console.log(this.jsonData[1]);
+            // console.log(this.jsonData[1]);
           },
           error: (error) => {
             console.error('Error al procesar el archivo CSV:', error);
@@ -43,39 +43,42 @@ export default {
       }
     },
     enviarDatos() {
-      if (this.jsonData) {
-        const datoAEnviar = JSON.stringify(this.jsonData[1])
-        console.log(datoAEnviar);
-        // console.log(this.jsonData[0].nombre);
-        // console.log(this.jsonData[0].email);
-        // console.log(this.jsonData[0].numero);
-        fetch(this.url, {
+      if (this.jsonData.length === 0) {
+        console.error('No hay datos en jsonData.');
+        return;
+      }
+
+      const url = 'https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/tests/trucode/items'; // Reemplaza con tu URL real
+
+      // Itera a través de cada fila en jsonData
+      this.jsonData.forEach((fila, index) => {
+        // Formatea el número agregando un guion medio cada 3 caracteres
+        if (fila.phone) {
+          fila.phone = fila.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        }
+        console.log(fila);
+        fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          // body: JSON.stringify({"name": "Jhon", "phone": "5555555555", "email": "foo@bar.com"}),
-          // body: JSON.stringify({"name": "Jhon", "email": "foo@bar.com", "phone": "555-555-5555"}),
-          // body: JSON.stringify({"name": "Hill", "email": "kam@han.biz", "phone": "329-009-0695"}),
-          body: datoAEnviar,
+          body: JSON.stringify(fila),
         })
           .then((response) => {
             if (!response.ok) {
-              throw new Error('La solicitud ha fallado');
+              throw new Error(`La solicitud para fila ${index + 1} ha fallado`);
             }
             return response.json();
           })
           .then((data) => {
-            console.log('Solicitud exitosa:', data);
+            console.log(`Solicitud exitosa para fila ${index + 1}:`, data);
             // Realiza acciones adicionales si es necesario
           })
           .catch((error) => {
-            console.error('Error:', error);
+            console.error(`Error para fila ${index + 1}:`, error);
             // Maneja el error de la solicitud
           });
-      } else {
-        console.error('No se ha cargado ningún archivo CSV.');
-      }
+      });
     },
   },
 };
