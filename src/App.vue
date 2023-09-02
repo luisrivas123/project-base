@@ -28,11 +28,7 @@ export default {
             // Convierte cada fila en un objeto JSON con las claves "nombre", "numero" y "email"
             this.jsonData = result.data.map((row) => {
               const [name, phone, email] = row[0].split(',');
-
-              // Formatea el número agregando un guion medio cada 3 caracteres
-              const numeroFormateado = phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-
-              return { name, phone: numeroFormateado, email };
+              return { name, phone, email };
             });
             // console.log(this.jsonData[1]);
           },
@@ -53,20 +49,21 @@ export default {
       // Itera a través de cada fila en jsonData
       this.jsonData.forEach((fila, index) => {
         // Formatea el número agregando un guion medio cada 3 caracteres
-        if (fila.phone) {
-          fila.phone = fila.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-        }
-        console.log(fila);
+        const numeroFormateado = fila.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        
+        // Crea un nuevo objeto con el número formateado
+        const filaFormateada = { ...fila, phone: numeroFormateado };
+        console.log(filaFormateada);
         fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(fila),
+          body: JSON.stringify(filaFormateada),
         })
           .then((response) => {
             if (!response.ok) {
-              throw new Error(`La solicitud para fila ${index + 1} ha fallado`);
+              throw new Error('La solicitud ha fallado');
             }
             return response.json();
           })
