@@ -8,6 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "csvtojson": "^2.0.10",
+    "papaparse": "^5.4.1",
     "vue": "^3.3.4"
   },
   "devDependencies": {
